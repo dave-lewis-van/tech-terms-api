@@ -38,7 +38,7 @@ jobs:
         run: |
           uvicorn main:app --host 0.0.0.0 --port 3000 &
           sleep 5
-          schemathesis run ./openapi.json --url http://localhost:3000 --report=schemathesis-report.txt
+          schemathesis run ./openapi.json --url http://localhost:3000 | tee schemathesis-report.txt
 
       - name: Upload Schemathesis Report
         if: always()

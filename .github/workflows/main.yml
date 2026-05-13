@@ -1,0 +1,40 @@
+name: API Documentation Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    
+jobs:
+  validate-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 1. GENERATION: Build the spec from your TypeScript/Python source
+      - name: Generate OpenAPI Spec
+        run: |
+          npm install
+          npm run generate-spec # Script that outputs openapi.json
+
+      # 2. LINTING: The "Schematron" for OpenAPI
+      - name: Lint OpenAPI Spec
+        uses: stoplightio/spectral-action@v0.8.13
+        with:
+          file_glob: 'openapi.json'
+
+      # 3. CONTRACT TESTING: Ensuring the Spec and Code haven't drifted
+      # This runs the API locally and tests it against the spec
+      - name: Run Schemathesis Tests
+        run: |
+          npm run start & # Start the API in the background
+          npx schemathesis run ./openapi.json --url http://localhost:3000
+        env:
+          NODE_ENV: test
+
+      # 4. SYNC: Push the validated spec to ReadMe
+      - name: Sync to ReadMe
+        uses: readmeio/rdme@v8
+        with:
+          rdme: openapi ./openapi.json --key=${{ secrets.README_API_KEY }}

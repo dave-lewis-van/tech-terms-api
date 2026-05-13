@@ -1,0 +1,16 @@
+extends: ["spectral:oas"]
+rules:
+  # Ensure every endpoint has a summary
+  operation-summary-required:
+    description: "Every operation must have a summary for the ReadMe sidebar."
+    given: "$.paths[*][*]"
+    then:
+      field: summary
+      function: truthy
+    severity: error
+
+  # Ensure the API has a description
+  info-description: error
+
+  # Ensure tags are used (helps ReadMe categorize endpoints)
+  operation-tags: error

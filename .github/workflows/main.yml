@@ -12,11 +12,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 1. GENERATION: Build the spec from your TypeScript/Python source
+      # 1. GENERATION: Use Python to export the spec from FastAPI
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+
       - name: Generate OpenAPI Spec
         run: |
-          npm install
-          npm run generate-spec # Script that outputs openapi.json
+          python gen_openapi.py  # This outputs your openapi.json
 
       # 2. LINTING: The "Schematron" for OpenAPI
       - name: Lint OpenAPI Spec

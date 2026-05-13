@@ -38,7 +38,14 @@ jobs:
         run: |
           uvicorn main:app --host 0.0.0.0 --port 3000 &
           sleep 5
-          schemathesis run ./openapi.json --url http://localhost:3000
+          schemathesis run ./openapi.json --url http://localhost:3000 --report=schemathesis-report.txt
+
+      - name: Upload Schemathesis Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schemathesis-report
+          path: schemathesis-report.txt
 
       # 4. SYNC: Push the validated spec to ReadMe
       - name: Sync to ReadMe

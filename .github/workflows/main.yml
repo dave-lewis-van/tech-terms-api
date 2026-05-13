@@ -36,10 +36,9 @@ jobs:
       # This runs the API locally and tests it against the spec
       - name: Run Schemathesis Tests
         run: |
-          npm run start & # Start the API in the background
-          npx schemathesis run ./openapi.json --url http://localhost:3000
-        env:
-          NODE_ENV: test
+          uvicorn main:app --host 0.0.0.0 --port 3000 &
+          sleep 5
+          schemathesis run ./openapi.json --url http://localhost:3000
 
       # 4. SYNC: Push the validated spec to ReadMe
       - name: Sync to ReadMe
